@@ -1,6 +1,6 @@
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateJWT } from "../helpers/generate_jwt.js";
 
 export const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -27,23 +27,41 @@ export const login = async (req, res, next) => {
       existingUser.password
     );
 
+    delete existingUser.password;
+
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { id: existingUser._id },
-      process.env.SECRET_JWT_TOKEN,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = await generateJWT(existingUser._id);
+
+    res.cookie(String(existingUser._id), token, {
+      path: "/",
+      expires: new Date(Date.now() + 10000 * 30),
+      httpOnly: true,
+      sameSite: "lax",
+    });
 
     res.status(200).json({
       message: "User logged in successfully",
       user: existingUser,
       token,
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getUser = async (req, res, next) => {
+  const { id } = req;
+
+  try {
+    const user = await User.findById(id, "-password -__v");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.status(200).json({ message: "User fetched successfully", user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Something went wrong" });

@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { login, signup } from "../controllers/user-controller.js";
+import { getUser, login, signup } from "../controllers/user-controller.js";
 import { emailValidation } from "../helpers/db-validators.js";
 import { validateFields } from "../middlewares/validate-fields.js";
+import { validateJWT } from "../middlewares/validate-jwt.js";
 
 const router = Router();
 
@@ -33,5 +34,7 @@ router.post(
   ],
   login
 );
+
+router.get("/user", validateJWT, getUser);
 
 export default router;

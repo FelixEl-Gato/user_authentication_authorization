@@ -1,7 +1,7 @@
 import express from "express";
 import dbMongoConnection from "../database/config.js";
 import userRoutes from "../routes/user-routes.js";
-
+import cookieParser from "cookie-parser";
 class Server {
   constructor() {
     this.app = express();
@@ -15,7 +15,11 @@ class Server {
   }
 
   middlewares() {
+    // JSON parsing
     this.app.use(express.json());
+
+    // Cookie settings
+    this.app.use(cookieParser());
   }
 
   routes() {
