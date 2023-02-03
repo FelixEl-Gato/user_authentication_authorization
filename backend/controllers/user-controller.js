@@ -21,21 +21,17 @@ export const login = async (req, res, next) => {
 
   try {
     const existingUser = await User.findOne({ email: email });
+    const { password: _password, ...user } = existingUser;
 
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
-
-    delete existingUser.password;
+    const isPasswordCorrect = await bcrypt.compare(password, _password);
 
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = await generateJWT(existingUser._id);
+    const token = await generateJWT(user._id);
 
-    res.cookie(String(existingUser._id), token, {
+    res.cookie(String(user._id), token, {
       path: "/",
       expires: new Date(Date.now() + 10000 * 30),
       httpOnly: true,
@@ -44,7 +40,7 @@ export const login = async (req, res, next) => {
 
     res.status(200).json({
       message: "User logged in successfully",
-      user: existingUser,
+      user,
       token,
     });
   } catch (error) {
