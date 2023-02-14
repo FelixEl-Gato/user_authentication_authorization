@@ -6,7 +6,6 @@ function Signup() {
 
   return (
     <div>
-      <Typography>Signup</Typography>
       <form onSubmit={handleSubmit}>
         <Box
           marginLeft="auto"
@@ -17,10 +16,18 @@ function Signup() {
           justifyContent="center"
           alignItems="center"
         >
-          <TextField margin="normal" />
-          <TextField margin="normal" />
-          <TextField margin="normal" />
-          <Button type="submit"> Signup</Button>
+          <Typography variant="h2">Signup</Typography>
+
+          <TextField variant="outlined" placeholder="Name" margin="normal" />
+          <TextField variant="outlined" placeholder="Email" margin="normal" />
+          <TextField
+            variant="outlined"
+            placeholder="Password"
+            margin="normal"
+          />
+          <Button variant="contained" type="submit">
+            Signup
+          </Button>
         </Box>
       </form>
     </div>
